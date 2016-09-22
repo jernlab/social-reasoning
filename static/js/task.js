@@ -80,6 +80,7 @@ var InteractionsExperiment = function() {
 			// d3.select("#nextbutton").on("click", function(){console.log("wow!")})
 		}
 	};
+
 	
 	var response_handler = function(e) {
 		if (!listening) return;
@@ -150,6 +151,10 @@ var InteractionsExperiment = function() {
 	// Register the response handler that is defined above to handle any
 	// key down events.
 	$("body").focus().keydown(response_handler); 
+	$("#next").click(function () {
+		remove_word();
+		next();
+	});
 
 	// Start the test
 	next();
