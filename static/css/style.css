@@ -66,6 +66,33 @@ h1 {
   color: darkgray;
 }
 
+.gameTable {
+  margin:auto;
+  margin-top: 5px;
+  text-align:center;
+}
+
+.gameTable td, .gameTable th {
+  padding: 5px;
+}
+
+#sliders {
+  margin-top: 15px;
+}
+
+#sliders input {
+  padding: 5px;
+  width: 200px;
+    border:none;
+    background:none;
+}
+
+#sliders span {
+  display: inline-block;
+  overflow: hidden;
+
+}
+
 .question {
   margin-bottom: 30px;
 }

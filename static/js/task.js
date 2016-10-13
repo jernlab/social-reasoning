@@ -14,9 +14,9 @@ var mycounterbalance = counterbalance;  // they tell you which condition you hav
 // All pages to be loaded
 var pages = [
 	"instructions/instruct-1.html",
-	"instructions/instruct-2.html",
-	"instructions/instruct-3.html",
-	"instructions/instruct-ready.html",
+	// "instructions/instruct-2.html",
+	// "instructions/instruct-3.html",
+	// "instructions/instruct-ready.html",
 	"stage.html",
 	"postquestionnaire.html"
 ];
@@ -25,9 +25,9 @@ psiTurk.preloadPages(pages);
 
 var instructionPages = [ // add as a list as many pages as you like
 	"instructions/instruct-1.html",
-	"instructions/instruct-2.html",
-	"instructions/instruct-3.html",
-	"instructions/instruct-ready.html"
+	// "instructions/instruct-2.html",
+	// "instructions/instruct-3.html",
+	// "instructions/instruct-ready.html"
 ];
 
 
@@ -49,34 +49,67 @@ var InteractionsExperiment = function() {
 	var wordon, // time word is presented
 	    listening = false;
 
+	var names = _.shuffle(['Jacob', 'David', 'Luke', 'Rebecca', 'Matt', 'Jack', 'Frank', 'Geoff', 'Robert', 'Emily', 'Zoe', 'Maria']);
 
+	var pd = [[8, 8],[0, 12],[12, 0],[4,4]]
+	var threat = [[12, 6],[6, 12],[6, 0],[0,6]]
+	var disjunctive = [[12,12], [12,12], [12,12], [0,0]]
+	var coordination = [[12,12], [0,0], [0,0], [12,12]]
+	var singleControl = [[6,6], [0,6], [6,6], [0,6]]
 
-	// Stimuli for a basic Stroop experiment
-	var stims = [
-			["SHIP", "red", "unrelated"],
-			["MONKEY", "green", "unrelated"],
-			["ZAMBONI", "blue", "unrelated"],
-			["RED", "red", "congruent"],
-			["GREEN", "green", "congruent"],
-			["BLUE", "blue", "congruent"],
-			["GREEN", "red", "incongruent"],
-			["BLUE", "green", "incongruent"],
-			["RED", "blue", "incongruent"]
-		];
+	var rowChoices = [0,1,2,3,4]
+	var playerChoices = ["A","B"]
 
-
-	stims = _.shuffle(stims);
-
-	var next = function() {
-		if (stims.length===0) {
-			finish();
+	var buildTableString = function(game, players, selected){
+		tablestr = "<table border=\"1\" class=\"gameTable\">"
+		tablestr += "<tr>" +
+				"<th>" + players[0] + "'s Choice</th>" +
+				"<th>" + players[1] + "'s Choice</th>" +
+				"<th>Reward for " + players[0] + "</th>" +
+				"<th>Reward for " + players[1] + "</th>" +
+			"</tr>" 
+		for(i = 0; i < 4; i++){
+			tablestr += "<tr>" +
+				"<td>" + playerChoices[Math.floor(i/2)] + "</td>" +
+				"<td>" + playerChoices[(i%2)] + "</td>" +
+				"<td>" + game[i][0] + "</td>" +
+				"<td>" + game[i][1] + "</td>" +
+			"</tr>" 
 		}
-		else {
-			stim = stims.shift();
-			show_word( stim[0], stim[1] );
+
+		tablestr += "</table>";
+
+		return tablestr;
+	};
+
+
+
+	attention = Math.floor(Math.random() * (5 - 1) + 1);
+	console.log(attention)
+	stims = _.shuffle(rowChoices);
+	games = _.shuffle([pd, threat, disjunctive, coordination, singleControl])
+	counter = 1
+	var next = function() {
+		d3.select("#trialn").html("Situation " + counter)
+		counter++;
+		chosenNames = [names.shift(),names.shift()]
+
+		if (games.length == 0) {
+			finish();
+		} else if (games.length == attention) {
+			// finish();
+			d3.select('#names').html("Please set all of the sliders to 0, and leave the text box blank, so that we know you are still paying attention.");
+			d3.select("#table").html(buildTableString(pd, chosenNames, row));
+			console.log("attention check")
+			attention = 500
+		} else {
+			game = games.shift();
+			// show_word( stim[0], stim[1] );
 			wordon = new Date().getTime();
-			listening = true;
-			d3.select("#query").html('<p id="prompt">Type "R" for Red, "B" for blue, "G" for green.</p>');
+			// listening = true;
+			row = 1
+			d3.select('#names').html(chosenNames[0] + " chose option A and "+ chosenNames[1] +" chose option B. This resulted in "+chosenNames[0]+" receiving $" + game[row][0] + ", and "+chosenNames[1]+" receiving $"+game[row][1] +".");
+			d3.select("#table").html(buildTableString(game, chosenNames, row));
 			// d3.select("#nextbutton").on("click", function(){console.log("wow!")})
 		}
 	};

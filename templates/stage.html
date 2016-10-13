@@ -1,12 +1,31 @@
 <div id="container-exp">
 	<div id="trial">
-		<h1>Situation n</h1>
-		<p> Alice and bob are doing X. </p>
-		<div id="stim"></div>
-		<div id="query"></div>
-		<input type="range" data-show-value="true">
+		<h1 id="trialn">Situation n
+		</h1>
+		<div id="names"></div>
+		<div id="table" class="situation"></div>
+
+		<form id="sliders">
+			<label for="friends"> friends </label>
+
+			<inline >
+			not likely<input id="friends" type="range" data-show-value="true"> very likely
+			</inline>
+
+
+			<label for="strangers"> strangers </label>
+			<input id="strangers" type="range" data-show-value="true">
+
+			<label for="enemies"> enemies </label>
+			<input id="enemies" type="range" data-show-value="true">
+
+		</form>
+
 		<p> Please explain your judgements. </p>
-		<input type="text" id="judgements">
+		<div>
+		<textarea id="judgements" rows="4" cols="40"> </textarea>
+		</div>
+
         <button type="button" id="next" value="next" class="btn btn-primary btn-lg continue">
             Continue <span class="glyphicon glyphicon-arrow-right"></span>
         </button>
