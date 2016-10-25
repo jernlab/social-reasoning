@@ -49,16 +49,19 @@ var InteractionsExperiment = function() {
 	var wordon, // time word is presented
 	    listening = false;
 
-	var names = _.shuffle(['Jacob', 'David', 'Luke', 'Rebecca', 'Matt', 'Jack', 'Frank', 'Geoff', 'Robert', 'Emily', 'Zoe', 'Maria']);
-
-	var pd = [[8, 8],[0, 12],[12, 0],[4,4]]
-	var threat = [[12, 6],[6, 12],[6, 0],[0,6]]
-	var disjunctive = [[12,12], [12,12], [12,12], [0,0]]
-	var coordination = [[12,12], [0,0], [0,0], [12,12]]
-	var singleControl = [[6,6], [0,6], [6,6], [0,6]]
+	var availableNames = _.shuffle(['Jacob', 'David', 'Luke', 'Rebecca', 'Matt', 'Jack', 'Frank', 'Geoff', 'Robert', 'Emily', 'Zoe', 'Maria', 'Austin', 'Hannah', "Matthew", 'Gavin', 'William', "Logan", 'Ryan', 'Sydney', 'Lauren', 'Kate', 'Megan', 'Kaylee', 'Olivia', 'Daniel', 'Richmond', 'Gerald', 'Sally']);
+       
+       var attentionGame = {game:[[8, 8],[12, 0],[0, 12],[4,4]], choices:_.shuffle([1])}       //???
+	var pd = {game:[[8, 8],[0, 12],[12, 0],[4,4]], choices:_.shuffle([0 ,1, 3])}                            // 0 1 3
+	var threat = {game:[[12, 6],[6, 12],[6, 0],[0,6]], choices:_.shuffle([ 0, 1, 2, 3])}                      //  0 1 2 3
+	var disjunctive = {game:[[12,12], [12,12], [12,12], [0,0]], choices:_.shuffle([ 0, 3])}      //  0 3
+	var coordination = {game:[[12,12], [0,0], [0,0], [12,12]], choices:_.shuffle([ 0, 1])}       //  0 1
+	var singleControl = {game:[[6,6], [0,6], [6,6], [0,6]], choices:_.shuffle([0, 1])}              //  0 1
 
 	var rowChoices = [0,1,2,3,4]
 	var playerChoices = ["A","B"]
+
+      var results = {}
 
 	var buildTableString = function(game, players, selected){
 		tablestr = "<table border=\"1\" class=\"gameTable\">"
@@ -69,11 +72,16 @@ var InteractionsExperiment = function() {
 				"<th>Reward for " + players[1] + "</th>" +
 			"</tr>" 
 		for(i = 0; i < 4; i++){
-			tablestr += "<tr>" +
+                    bgcolor = "bgcolor=\"#FFFFFF\""
+                    if(selected == i){
+                       bgcolor = "bgcolor=\"#FFFFAA\""
+
+                    }
+			tablestr += "<tr " + bgcolor + " >" +
 				"<td>" + playerChoices[Math.floor(i/2)] + "</td>" +
 				"<td>" + playerChoices[(i%2)] + "</td>" +
-				"<td>" + game[i][0] + "</td>" +
-				"<td>" + game[i][1] + "</td>" +
+				"<td>$" + game.game[i][0] + "</td>" +
+				"<td>$" + game.game[i][1] + "</td>" +
 			"</tr>" 
 		}
 
@@ -82,24 +90,147 @@ var InteractionsExperiment = function() {
 		return tablestr;
 	};
 
+      friendsAnswered = false 
+      strangersAnswered = false 
+      enemiesAnswered = false 
+      justificationAnswered = false
 
 
+      var gamesetup = function(names) {
+        friendsAnswered = false 
+        strangersAnswered = false 
+        enemiesAnswered = false 
+        justificationAnswered = false
+          $("#friends").click(function(){friendsAnswered = true; $("#friendsdiv").css('background-color', "white")}) ;
+          $("#strangers").click(function(){strangersAnswered = true; $("#strangersdiv").css('background-color', "white")}) ;
+          $("#enemies").click(function(){enemiesAnswered = true; $("#enemiesdiv").css('background-color', "white")}) ;
+          $("#judgements").click(function(){justificationAnswered = true; $("#judgements").css('background-color', "white")}) ;
+          $("#instructionButton").off( 'click.someNamespace')
+          $("#instructionButton").on( 'click.someNamespace', function(){
+            console.log("Setting up new trial");
+            state = $('body').html()
+            psiTurk.doInstructions(
+              instructionPages, // a list of pages you want to display in sequence
+              function() { $('body').html(state);
+              gamesetup(names)} // what you want to do when you are done with instructions
+            );
+          // psiTurk.showPage("instructions/instruct-1.html")
+          })
+
+
+          console.log(row)
+          d3.select('#attention').html("");
+          d3.select('#names').html(names[0] + " chose option A and "+ names[1] +" chose option B. This resulted in "+names[0]+" receiving $" + game.game[row][0] + ", and "+names[1]+" receiving $"+game.game[row][1] +".");
+          d3.select("#table").html(buildTableString(game, names, row));
+          d3.select("#friends").property('value',50)
+          d3.select("#strangers").property('value',50)
+          d3.select("#enemies").property('value',50)
+          d3.select("#judgements").property('value','')
+          $("#nextbutton").off('click.someSpace');
+          $("#nextbutton").on('click.someSpace', function () {
+        // friendsAnswered = false 
+        //   strangersAnswered = false 
+        //   enemiesAnswered = false 
+        //   justificationAnswered = false
+          tocontinue = true
+          if(!friendsAnswered){
+            console.log("A question was left unanswered.")
+            $("#friendsdiv").css('background-color', "#ffe0e0")
+            tocontinue = false
+          }
+          if(!strangersAnswered){
+            console.log("A question was left unanswered.")
+            $("#strangersdiv").css('background-color', "#ffe0e0")
+            tocontinue = false
+          }
+          if(!enemiesAnswered){
+            console.log("A question was left unanswered.")
+            $("#enemiesdiv").css('background-color', "#ffe0e0")
+            tocontinue = false
+          }
+          if(!justificationAnswered){
+            console.log("A question was left unanswered.")
+            $("#judgements").css('background-color', "#ffe0e0")
+            tocontinue = false
+          }
+
+          if(!tocontinue){
+            // alert("Please answer for all of the fields")
+            return
+          }
+
+ //           psiTurk.recordTrialData({'phase':"TEST",
+ //                                            'word':stim[0],
+ //                                            'color':stim[1],
+ //                                            'relation':stim[2],
+ //                                            'response':response,
+ //                                            'hit':hit,
+ //                                            'rt':rt}
+ //                                          );\
+
+            friendProb = d3.select("#friends")[0][0].value
+            strangerProb = d3.select("#strangers")[0][0].value
+            enemyProb = d3.select("#enemies")[0][0].value
+            judgements = d3.select("#judgements")[0][0].value
+            results[[game,row]] = {'friendProb':friendProb,
+                'strangerProb':strangerProb,
+                'enemyProb':enemyProb,
+                'judgements':judgements
+            }
+
+
+    next();
+  });
+      }
+       
+
+      chosenNames = [0,0]
+        nTrials = 12
 	attention = Math.floor(Math.random() * (5 - 1) + 1);
 	console.log(attention)
 	stims = _.shuffle(rowChoices);
 	games = _.shuffle([pd, threat, disjunctive, coordination, singleControl])
-	counter = 1
+      trials = []
+      i=0
+      for(i in games){
+        console.log(games[i])
+        for(j in games[i].choices){
+          trials.push({game:games[i].game,
+            choice :games[i].choices[j]
+          })
+        }
+      }
+      games = trials
+      console.log(trials)
+	counter = 0
+      game = null
+      nTrials = trials.length + 1
 	var next = function() {
-		d3.select("#trialn").html("Situation " + counter)
-		counter++;
-		chosenNames = [names.shift(),names.shift()]
+              counter++;
+		d3.select("#trialNumber").html("Case "+counter+" of "+(nTrials))
+		chosenNames = [availableNames.shift(),availableNames.shift()]
+              row = Math.floor(Math.random() * 4 );
+
+              // Reset all the forms
+              d3.select("#friends").property('value',50)
+              d3.select("#strangers").property('value',50)
+              d3.select("#enemies").property('value',50)
+              $("#friendsdiv").css('background-color', "white")
+              $("#strangersdiv").css('background-color', "white")
+              $("#enemiesdiv").css('background-color', "white")
+              $("#judgements").css('background-color', "white")
+
+
 
 		if (games.length == 0) {
 			finish();
 		} else if (games.length == attention) {
 			// finish();
-			d3.select('#names').html("Please set all of the sliders to 0, and leave the text box blank, so that we know you are still paying attention.");
-			d3.select("#table").html(buildTableString(pd, chosenNames, row));
+                    game=attentionGame
+			d3.select('#names').html("");
+                    d3.select('#attention').html("Please enter just a \"0\" in the text box, so that we know you are still paying attention.");
+			
+                    d3.select("#table").html(buildTableString(game, chosenNames, row));
 			console.log("attention check")
 			attention = 500
 		} else {
@@ -107,9 +238,9 @@ var InteractionsExperiment = function() {
 			// show_word( stim[0], stim[1] );
 			wordon = new Date().getTime();
 			// listening = true;
-			row = 1
-			d3.select('#names').html(chosenNames[0] + " chose option A and "+ chosenNames[1] +" chose option B. This resulted in "+chosenNames[0]+" receiving $" + game[row][0] + ", and "+chosenNames[1]+" receiving $"+game[row][1] +".");
-			d3.select("#table").html(buildTableString(game, chosenNames, row));
+                    gamesetup(chosenNames)
+			
+
 			// d3.select("#nextbutton").on("click", function(){console.log("wow!")})
 		}
 	};
@@ -141,7 +272,6 @@ var InteractionsExperiment = function() {
 		if (response.length>0) {
 			listening = false;
 			var hit = response == stim[1];
-			var rt = new Date().getTime() - wordon;
 
 			psiTurk.recordTrialData({'phase':"TEST",
                                      'word':stim[0],
@@ -157,7 +287,33 @@ var InteractionsExperiment = function() {
 	};
 
 	var finish = function() {
-	    $("body").unbind("keydown", response_handler); // Unbind keys
+	    strings = {attentionGame:"attentionGame", pd:"pd", threat:"threat", disjunctive:"disjunctive", coordination:"coordination", singleControl:"singleControl"}
+          var rt = new Date().getTime() - wordon;    
+          items = [attentionGame, pd, threat, disjunctive, coordination, singleControl]
+          // trials = []
+          //       i=0
+          //       for(i in games){
+          //         console.log(games[i])
+          //         for(j in games[i].choices){
+          //           trials.push({game:games[i].game,
+          //             choice :games[i].choices[j]
+          //           })
+          //         }
+          //       }
+
+          for(item in [attentionGame, pd, threat, disjunctive, coordination, singleControl]){
+            console.log("item",item)
+            // psiTurk.recordTrialData({'game':strings[items[item]],
+            //                          'friendProb':results[items[item]]["friendProb"],
+            //                          'strangerProb':results[items[item]]["strangerProb"],
+            //                          'enemyProb':results[items[item]]["enemyProb"],
+            //                          'judgements':results[items[item]]["judgements"],
+            //                          //'hit':hit,
+            //                          'rt':rt}
+            //                        );
+
+          }
+
 	    currentview = new Questionnaire();
 	};
 	
@@ -172,22 +328,64 @@ var InteractionsExperiment = function() {
 			.style("margin","20px")
 			.text(text);
 	};
-
-	var remove_word = function() {
-		d3.select("#word").remove();
-	};
-
 	
 	// Load the stage.html snippet into the body of the page
 	psiTurk.showPage('stage.html');
 
-	// Register the response handler that is defined above to handle any
-	// key down events.
-	$("body").focus().keydown(response_handler); 
-	$("#next").click(function () {
-		remove_word();
-		next();
-	});
+	// Register the response handler that is defined above to handle 
+	// $("#next").click(function () {
+ //        // friendsAnswered = false 
+ //        //   strangersAnswered = false 
+ //        //   enemiesAnswered = false 
+ //        //   justificationAnswered = false
+ //          tocontinue = true
+ //          if(!friendsAnswered){
+ //            console.log("YOU DIDNT ANSWER IT")
+ //            $("#friendsdiv").css('background-color', "#ffe0e0")
+ //            tocontinue = false
+ //          }
+ //          if(!strangersAnswered){
+ //            console.log("YOU DIDNT ANSWER IT")
+ //            $("#strangersdiv").css('background-color', "#ffe0e0")
+ //            tocontinue = false
+ //          }
+ //          if(!enemiesAnswered){
+ //            console.log("YOU DIDNT ANSWER IT")
+ //            $("#enemiesdiv").css('background-color', "#ffe0e0")
+ //            tocontinue = false
+ //          }
+ //          if(!justificationAnswered){
+ //            console.log("YOU DIDNT ANSWER IT")
+ //            $("#judgements").css('background-color', "#ffe0e0")
+ //            tocontinue = false
+ //          }
+
+ //          if(!tocontinue){
+ //            alert("Please answer for all of the fields")
+ //            return
+ //          }
+
+ // //           psiTurk.recordTrialData({'phase':"TEST",
+ // //                                            'word':stim[0],
+ // //                                            'color':stim[1],
+ // //                                            'relation':stim[2],
+ // //                                            'response':response,
+ // //                                            'hit':hit,
+ // //                                            'rt':rt}
+ // //                                          );\
+ //            friendProb = d3.select("#friends")[0][0].value
+ //            strangerProb = d3.select("#strangers")[0][0].value
+ //            enemyProb = d3.select("#enemies")[0][0].value
+ //            judgements = d3.select("#judgements")[0][0].value
+ //            results[game] = {'friendProb':friendProb,
+ //                'strangerProb':strangerProb,
+ //                'enemyProb':enemyProb,
+ //                'judgements':judgements
+ //            }
+
+
+	// 	next();
+	// });
 
 	// Start the test
 	next();
@@ -257,6 +455,8 @@ var currentview;
 /*******************
  * Run Task
  ******************/
+// window.resizeTo(1024,850)
+// experiment = new InteractionsExperiment();
 $(window).load( function(){
     psiTurk.doInstructions(
     	instructionPages, // a list of pages you want to display in sequence

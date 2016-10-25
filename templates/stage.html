@@ -1,43 +1,59 @@
-<div id="container-exp">
+<body>
     <nav id="header" class="navbar navbar-default navbar-fixed-top">
         <div id="instructionHeader">
-            <div class="alert alert-info" role="alert" id="trialNumber">
+            <div class="alert alert-info" role="alert" >
+            <div id="trialNumber"> </div>
+
+            <button type="button" class="btn btn-primary btn-lg" id="instructionButton" data-toggle="tooltip">Re-read Instructions</button>
             </div>
-            <button class="tooltip btn btn-primary btn-lg" id="tooltip" data-toggle="tooltip">Re-read Instructions</button>
+            
             <div id="trial"></div>
             <div id="trialImage"></div>
             <div id="query"></div>
         </div>
     </nav>
+    <div id="container-exp">
 	<div id="trial">
-		<h1 id="trialn">Situation n
-		</h1>
+		<!-- <h1 id="trialn">Situation n -->
+		<!-- </h1> -->
 		<div id="names"></div>
 		<div id="table" class="situation"></div>
-
+              <div id="attention"></div>
 		<form id="sliders">
-			<label for="friends"> friends </label>
+			<label for="friends"> Friends </label>
 
-			<inline >
-			not likely<input id="friends" type="range" data-show-value="true"> very likely
-			</inline>
+                    <div  id="friendsdiv">
+			<span >Not likely</span>
+			<input id="friends" type="range" data-show-value="true">
+                   <span>Very likely</span>
+			</div>
 
 
-			<label for="strangers"> strangers </label>
-			<input id="strangers" type="range" data-show-value="true">
+			<label for="strangers"> Strangers </label>
+                    <div id="strangersdiv">
+                    <span >Not likely</span>
+                    <input id="strangers" type="range" data-show-value="true">
+                    <span>Very likely</span>
+                    </div>
 
-			<label for="enemies"> enemies </label>
-			<input id="enemies" type="range" data-show-value="true">
+			<label for="enemies"> Enemies </label>
+                    <div id="enemiesdiv">
+                    <span >Not likely</span>
+                    <input id="enemies" type="range" data-show-value="true">
+                    <span>Very likely</span>
+                    </div>
+			
 
 		</form>
 
-		<p> Please explain your judgements. </p>
+		<p> Please explain your judgments. </p>
 		<div>
 		<textarea id="judgements" rows="4" cols="40"> </textarea>
 		</div>
 
-        <button type="button" id="next" value="next" class="btn btn-primary btn-lg continue">
+        <button type="button" id="nextbutton" value="next" class="btn btn-primary btn-lg continue">
             Continue <span class="glyphicon glyphicon-arrow-right"></span>
         </button>
 	</div>
 </div>
+<body>
