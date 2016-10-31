@@ -14,7 +14,7 @@ var mycounterbalance = counterbalance;  // they tell you which condition you hav
 // All pages to be loaded
 var pages = [
 	"instructions/instruct-1.html",
-	// "instructions/instruct-2.html",
+	"instructions/instruct-review.html",
 	// "instructions/instruct-3.html",
 	// "instructions/instruct-ready.html",
 	"stage.html",
@@ -25,11 +25,11 @@ psiTurk.preloadPages(pages);
 
 var instructionPages = [ // add as a list as many pages as you like
 	"instructions/instruct-1.html",
-	// "instructions/instruct-2.html",
-	// "instructions/instruct-3.html",
-	// "instructions/instruct-ready.html"
 ];
+var returnInstructions = [ // add as a list as many pages as you like
+  "instructions/instruct-review.html",
 
+];
 
 /********************
 * HTML manipulation
@@ -51,20 +51,24 @@ var InteractionsExperiment = function() {
 
 	var availableNames = _.shuffle(['Jacob', 'David', 'Luke', 'Rebecca', 'Matt', 'Jack', 'Frank', 'Geoff', 'Robert', 'Emily', 'Zoe', 'Maria', 'Austin', 'Hannah', "Matthew", 'Gavin', 'William', "Logan", 'Ryan', 'Sydney', 'Lauren', 'Kate', 'Megan', 'Kaylee', 'Olivia', 'Daniel', 'Richmond', 'Gerald', 'Sally']);
        
-       var attentionGame = {game:[[8, 8],[12, 0],[0, 12],[4,4]], choices:_.shuffle([1])}       //???
-	var pd = {game:[[8, 8],[0, 12],[12, 0],[4,4]], choices:_.shuffle([0 ,1, 3])}                            // 0 1 3
-	var threat = {game:[[12, 6],[6, 12],[6, 0],[0,6]], choices:_.shuffle([ 0, 1, 2, 3])}                      //  0 1 2 3
-	var disjunctive = {game:[[12,12], [12,12], [12,12], [0,0]], choices:_.shuffle([ 0, 3])}      //  0 3
-	var coordination = {game:[[12,12], [0,0], [0,0], [12,12]], choices:_.shuffle([ 0, 1])}       //  0 1
-	var singleControl = {game:[[6,6], [0,6], [6,6], [0,6]], choices:_.shuffle([0, 1])}              //  0 1
+       var attentionGame = {gameString:"attentionGame", game:[[8, 8],[12, 0],[0, 12],[4,4]], choices:_.shuffle([1])}       //???
+	var pd = {gameString:"pd", game:[[8, 8],[0, 12],[12, 0],[4,4]], choices:_.shuffle([0 ,1, 3])}                            // 0 1 3
+	var threat = {gameString:"threat", game:[[12, 6],[6, 12],[6, 0],[0,6]], choices:_.shuffle([ 0, 1, 2, 3])}                      //  0 1 2 3
+	var disjunctive = {gameString:"disjunctive", game:[[12,12], [12,12], [12,12], [0,0]], choices:_.shuffle([0, 3])}      //  0 3
+	var coordination = {gameString:"coordination", game:[[12,12], [0,0], [0,0], [12,12]], choices:_.shuffle([ 0, 1])}       //  0 1
+	var singleControl = {gameString:"singleControl", game:[[6,6], [0,6], [6,6], [0,6]], choices:_.shuffle([0, 1])}              //  0 1
 
 	var rowChoices = [0,1,2,3,4]
-	var playerChoices = ["A","B"]
+	var playerChoices = ["<span style=\"color:#FF0000\">A</span>","<span style=\"color:#0000FF\">B</span>"]
 
       var results = {}
 
 	var buildTableString = function(game, players, selected){
-		tablestr = "<table border=\"1\" class=\"gameTable\">"
+		tablestr = "<table border=\"1\" class=\"gameTable\"><colgroup>" +
+    "<col class=\"grey\" />" +
+    "<col class=\"red\" span=\"2\" />" +
+    "<col class=\"blue\" />" +
+    "</colgroup>"
 		tablestr += "<tr>" +
 				"<th>" + players[0] + "'s Choice</th>" +
 				"<th>" + players[1] + "'s Choice</th>" +
@@ -110,7 +114,7 @@ var InteractionsExperiment = function() {
             console.log("Setting up new trial");
             state = $('body').html()
             psiTurk.doInstructions(
-              instructionPages, // a list of pages you want to display in sequence
+              returnInstructions, // a list of pages you want to display in sequence
               function() { $('body').html(state);
               gamesetup(names)} // what you want to do when you are done with instructions
             );
@@ -118,10 +122,10 @@ var InteractionsExperiment = function() {
           })
 
 
-          console.log(row)
+          console.log(game.choice)
           d3.select('#attention').html("");
-          d3.select('#names').html(names[0] + " chose option A and "+ names[1] +" chose option B. This resulted in "+names[0]+" receiving $" + game.game[row][0] + ", and "+names[1]+" receiving $"+game.game[row][1] +".");
-          d3.select("#table").html(buildTableString(game, names, row));
+          d3.select('#names').html(names[0] + " chose option " + playerChoices[Math.floor(game.choice/2)]  + " and "+ names[1] +" chose option " + playerChoices[(game.choice%2)] + ". This resulted in "+names[0]+" receiving $" + game.game[game.choice][0] + ", and "+names[1]+" receiving $"+game.game[game.choice][1] +".");
+          d3.select("#table").html(buildTableString(game, names, game.choice));
           d3.select("#friends").property('value',50)
           d3.select("#strangers").property('value',50)
           d3.select("#enemies").property('value',50)
@@ -172,7 +176,8 @@ var InteractionsExperiment = function() {
             strangerProb = d3.select("#strangers")[0][0].value
             enemyProb = d3.select("#enemies")[0][0].value
             judgements = d3.select("#judgements")[0][0].value
-            results[[game,row]] = {'friendProb':friendProb,
+            results[[game.gameString,row]] = {'game':game.gameString,
+                'friendProb':friendProb,
                 'strangerProb':strangerProb,
                 'enemyProb':enemyProb,
                 'judgements':judgements
@@ -186,8 +191,7 @@ var InteractionsExperiment = function() {
 
       chosenNames = [0,0]
         nTrials = 12
-	attention = Math.floor(Math.random() * (5 - 1) + 1);
-	console.log(attention)
+
 	stims = _.shuffle(rowChoices);
 	games = _.shuffle([pd, threat, disjunctive, coordination, singleControl])
       trials = []
@@ -195,17 +199,21 @@ var InteractionsExperiment = function() {
       for(i in games){
         console.log(games[i])
         for(j in games[i].choices){
-          trials.push({game:games[i].game,
+          trials.push({gameString:games[i].gameString,
+            game:games[i].game,
             choice :games[i].choices[j]
           })
         }
       }
       games = trials
+      attention = Math.floor(Math.random() * (trials.length - 2) + 2);
+      console.log(attention)
       console.log(trials)
 	counter = 0
       game = null
       nTrials = trials.length + 1
 	var next = function() {
+              window.scrollTo(0,0);
               counter++;
 		d3.select("#trialNumber").html("Case "+counter+" of "+(nTrials))
 		chosenNames = [availableNames.shift(),availableNames.shift()]
@@ -289,7 +297,7 @@ var InteractionsExperiment = function() {
 	var finish = function() {
 	    strings = {attentionGame:"attentionGame", pd:"pd", threat:"threat", disjunctive:"disjunctive", coordination:"coordination", singleControl:"singleControl"}
           var rt = new Date().getTime() - wordon;    
-          items = [attentionGame, pd, threat, disjunctive, coordination, singleControl]
+          // items = [attentionGame, pd, threat, disjunctive, coordination, singleControl]
           // trials = []
           //       i=0
           //       for(i in games){
@@ -301,8 +309,10 @@ var InteractionsExperiment = function() {
           //         }
           //       }
 
-          for(item in [attentionGame, pd, threat, disjunctive, coordination, singleControl]){
-            console.log("item",item)
+          console.log(results)
+          for(item in results){
+            console.log("item")
+            console.log(results[item[0]])
             // psiTurk.recordTrialData({'game':strings[items[item]],
             //                          'friendProb':results[items[item]]["friendProb"],
             //                          'strangerProb':results[items[item]]["strangerProb"],
@@ -455,7 +465,7 @@ var currentview;
 /*******************
  * Run Task
  ******************/
-// window.resizeTo(1024,850)
+window.resizeTo(1024,900)
 // experiment = new InteractionsExperiment();
 $(window).load( function(){
     psiTurk.doInstructions(
