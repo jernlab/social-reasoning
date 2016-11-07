@@ -75,8 +75,8 @@ def compute_bonus():
     if not request.args.has_key('uniqueId'):
         raise ExperimentError('improper_inputs')  # i don't like returning HTML to JSON requests...  maybe should change this
     uniqueId = request.args['uniqueId']
-    print("wow")
-    print("uniqueid:",uniqueId)
+    # print("wow")
+    # print("uniqueid:",uniqueId)
     try:
         # lookup user in database
         user = Participant.query.\
@@ -84,16 +84,20 @@ def compute_bonus():
                one()
         user_data = loads(user.datastring) # load datastring from JSON
         bonus = 0
-
+        # print("got here")
+        # print(user_data['data'])
         for record in user_data['data']: # for line in data file
             trial = record['trialdata']
-            if trial['phase']=='TEST':
-                if trial['hit']==True:
-                    bonus += 0.02
+            # print(trial['phase'])
+            if trial['phase']=='END':
+                if trial['status']=='submit':
+                    bonus = 0.00
+        # print("also got here")
         user.bonus = bonus
         db_session.add(user)
         db_session.commit()
         resp = {"bonusComputed": "success"}
+        # print("not sure what's going on")
         return jsonify(**resp)
     except:
         abort(404)  # again, bad to display HTML, but...
