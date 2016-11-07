@@ -1,22 +1,22 @@
 [HIT Configuration]
-title = Stroop task
-description = Judge the color of a series of words.
-amt_keywords = Perception, Psychology
+title = Social reasoning
+description = Make inferences about people's relationships
+amt_keywords = psychology, read, story, social, reasoning, inference, relationship
 lifetime = 24
 us_only = true
 approve_requirement = 95
-contact_email_on_error = youremail@gmail.com
-ad_group = Default psiTurk Stroop Example
-psiturk_keywords = stroop
-organization_name = New Great University
-browser_exclude_rule = MSIE, mobile, tablet
+contact_email_on_error = TODO
+ad_group = Social reasoning
+psiturk_keywords = inference, social reasoning, prisoner's dilemma
+organization_name = Rose-Hulman Institute of Technology
+browser_exclude_rule = mobile, tablet
 
 [Database Parameters]
-database_url = sqlite:///participants.db
-table_name = turkdemo
+database_url = TODO
+table_name = TODO
 
 [Server Parameters]
-host = 137.112.158.133
+host = TODO
 port = 80
 cutoff_time = 30
 logfile = server.log
