@@ -67,6 +67,8 @@ makePlots <- function(extractedData){
   grouped <- group_by(extractedData, id)
   rankings <- summarise(grouped, maxes = max(correlation), model = which(correlation == max(correlation)), mse = max(mse))
   
+  confidenceInterval = 1.96 * sd(extractedData$correlation)/sqrt(length(extractedData$correlation))
+  print(confidenceInterval)
   # Count the number of people that have maximum correspondence to each model
   count(group_by(rankings, model))
   plot(rankings$model, rankings$id)
