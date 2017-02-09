@@ -50,7 +50,7 @@ var InteractionsExperiment = function() {
 
  var availableNames = _.shuffle(['Jacob', 'David', 'Luke', 'Rebecca', 'Matt', 'Jack', 'Frank', 'Geoff', 'Robert', 'Emily', 'Zoe', 'Maria', 'Austin', 'Hannah', "Matthew", 'Gavin', 'William', "Logan", 'Ryan', 'Sydney', 'Lauren', 'Kate', 'Megan', 'Kaylee', 'Olivia', 'Daniel', 'Richmond', 'Gerald', 'Sally']);
 
-       var attentionGame = {gameString:"attentionGame", game:[[8, 8],[12, 0],[0, 12],[4,4]], choices:_.shuffle([1])}       //???
+  var attentionGame = {gameString:"attentionGame", game:[[8, 8],[12, 0],[0, 12],[4,4]], choices:_.shuffle([1])}       //???
 	var pd = {gameString:"pd", game:[[8, 8],[0, 12],[12, 0],[4,4]], choices:_.shuffle([0 ,1, 3])}                            // 0 1 3
 	var threat = {gameString:"threat", game:[[12, 6],[6, 12],[6, 0],[0,6]], choices:_.shuffle([ 0, 1, 2, 3])}                      //  0 1 2 3
 	var disjunctive = {gameString:"disjunctive", game:[[12,12], [12,12], [12,12], [0,0]], choices:_.shuffle([0, 3])}      //  0 3
@@ -182,7 +182,9 @@ var InteractionsExperiment = function() {
           'friends':friendProb,
           'strangerProb':strangerProb,
           'enemyProb':enemyProb,
-          'judgements':judgements})
+          'judgements':judgements,
+          'playerA':names[0],
+          'playerB':names[1]})
         psiTurk.saveData()
 
 
@@ -210,8 +212,8 @@ for(i in games){
 }
 games = trials
 
-// generate index of attention check 
-attention = Math.floor(Math.random() * (trials.length - 2) + 2);
+// generate index of attention check after trial 9 ( generates and index between 2 and 5)
+attention = Math.floor(Math.random() * (trials.length - 10) + 2);
 console.log(attention)
 console.log(trials)
 counter = 0
@@ -241,7 +243,7 @@ var next = function() {
               game=attentionGame
               d3.select('#names').html("");
               d3.select('#attention').html("Please enter just a \"0\" in the text box and hit next, so that we know you are still paying attention.");
-
+              d3.select("#judgements").property('value','');
               d3.select("#table").html(buildTableString(game, chosenNames, row));
               console.log("attention check")
               attention = 500
