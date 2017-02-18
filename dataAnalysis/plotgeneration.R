@@ -242,6 +242,10 @@ extractCorrelation <- function(predictions, d, includeStrangers = FALSE) {
 # yTickLables: whether or not to label the y ticks
 # saveFile: set to TRUE to save a copy of the plot
 makeCorrPlot <- function(means, fulldata, t, fileName, yTickLabels = TRUE, saveFile = FALSE) {
+    
+    # reorder the model order on the plot so they match order in the paper
+    means$model <- factor(means$model, levels=c("recursive","independent","heuristic"))
+
 	p <- ggplot(data=means, aes(x=model)) +
 		  geom_point(aes(y=mean), stat="identity") +
 		  geom_errorbar(aes(ymin=mean-ci95, ymax=mean+ci95), width=0.2) +
@@ -260,16 +264,16 @@ makeCorrPlot <- function(means, fulldata, t, fileName, yTickLabels = TRUE, saveF
 		  ggtitle(t)
 	if (yTickLabels) {
 		#scale_y_continuous(name="Correlation", limits=c(-0.5,1)) +
-		p <- p + scale_y_continuous(limits=c(-0.5,1))
+		p <- p + scale_y_continuous(limits=c(0,1))
 	}
 	else {
-		p <- p + scale_y_continuous(limits=c(-0.5,1), labels=NULL)
+		p <- p + scale_y_continuous(limits=c(0,1), labels=NULL)
 	}
 	
 	print(p)
 
 	if (saveFile) {
-		dev.copy(pdf, fileName, width=1.1, height=2)
+		dev.copy(pdf, fileName, width=1.1, height=1.8)
 		dev.off()
 	}
 }
@@ -299,7 +303,7 @@ means.group1 <- rs.tidy.grouped %>%
 				summarize(mean = mean(r),
 				          sd = sd(r),
 						  ci95 = CI*sd(r)/sqrt(groupCounts$n[1]))
-makeCorrPlot(means.group1, filter(rs.tidy.grouped, bestModel==1), "Group 1","group1_corr.pdf", yTickLabels = FALSE, saveFile=TRUE)
+makeCorrPlot(means.group1, filter(rs.tidy.grouped, bestModel==1), "Group 1","group1_corr.pdf", yTickLabels = FALSE, saveFile=FALSE)
 print("Group 1 mean rs:")
 print(means.group1)
 						  
@@ -309,7 +313,7 @@ means.group2 <- rs.tidy.grouped %>%
 				summarize(mean = mean(r),
 				          sd = sd(r),
 						  ci95 = CI*sd(r)/sqrt(groupCounts$n[2]))
-makeCorrPlot(means.group2, filter(rs.tidy.grouped, bestModel==2),  "Group 2", "group2_corr.pdf", yTickLabels = FALSE, saveFile=TRUE)
+makeCorrPlot(means.group2, filter(rs.tidy.grouped, bestModel==2),  "Group 2", "group2_corr.pdf", yTickLabels = FALSE, saveFile=FALSE)
 print("Group 2 mean rs:")
 print(means.group2)
 						  
@@ -319,7 +323,7 @@ means.group3 <- rs.tidy.grouped %>%
 				summarize(mean = mean(r),
 				          sd = sd(r),
 						  ci95 = CI*sd(r)/sqrt(groupCounts$n[3]))
-makeCorrPlot(means.group3, filter(rs.tidy.grouped, bestModel==3),  "Group 3", "group3_corr.pdf", yTickLabels = FALSE, saveFile=TRUE)
+makeCorrPlot(means.group3, filter(rs.tidy.grouped, bestModel==3),  "Group 3", "group3_corr.pdf", yTickLabels = FALSE, saveFile=FALSE)
 print("Group 3 mean rs:")
 print(means.group3)
 
