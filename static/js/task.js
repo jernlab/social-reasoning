@@ -100,6 +100,8 @@ var InteractionsExperiment = function() {
 
 
  var gamesetup = function(names) {
+  // This clears all state variables, generates the next scenario shown to the player, 
+  // and generates some HTML elements to be displayed on page
   friendsAnswered = false 
   strangersAnswered = false 
   enemiesAnswered = false 
@@ -122,6 +124,7 @@ var InteractionsExperiment = function() {
         })
 
 
+  // Sets up sliders and gets the names of the fake players
   console.log(game.choice)
   d3.select('#attention').html("");
   d3.select('#names').html(names[0] + " chose option " + playerChoices[Math.floor(game.choice/2)]  + " and "+ names[1] +" chose option " + playerChoices[(game.choice%2)] + ". This resulted in "+names[0]+" receiving $" + game.game[game.choice][0] + ", and "+names[1]+" receiving $"+game.game[game.choice][1] +".");
@@ -131,6 +134,9 @@ var InteractionsExperiment = function() {
   d3.select("#enemies").property('value',50)
   d3.select("#judgements").property('value','')
 
+
+  // Sets up click listers for the submit button
+  // verifies all of the logic, and makes sure that the user has made a judgment
   $("#nextbutton").off('click.someSpace');
   $("#nextbutton").on('click.someSpace', function () {
 
@@ -219,6 +225,10 @@ console.log(trials)
 counter = 0
 game = null
 nTrials = trials.length + 1
+
+
+
+// generates the next scenario and chooses the fake player names
 var next = function() {
   window.scrollTo(0,0);
   counter++;
@@ -256,6 +266,8 @@ var next = function() {
 		}
 	};
 
+
+// Submits data when all scenarios are completed
 
 	var finish = function() {
    strings = {attentionGame:"attentionGame", pd:"pd", threat:"threat", disjunctive:"disjunctive", coordination:"coordination", singleControl:"singleControl"}
